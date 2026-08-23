@@ -1,0 +1,18 @@
+# Build output
+bin/
+obj/
+
+# Visual Studio
+.vs/
+
+# User-specific Visual Studio files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Test results
+TestResults/
+
+# Visual Studio Code
+.vscode/
