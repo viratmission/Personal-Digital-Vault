@@ -23,6 +23,13 @@ namespace PersonalDigitalVault
                 )
             );
             builder.Services.AddScoped<IUserRepository, UserRepository>();
+            
+            builder.Services.AddScoped<IFolderRepository, FolderRepository>();
+            builder.Services.AddScoped<IFolderService, FolderService>();
+
+            builder.Services.AddScoped<IDocumentRepository, DocumentRepository>();
+            builder.Services.AddScoped<IDocumentService, DocumentService>();
+
             builder.Services.AddScoped<IAuthService, AuthService>();
 
             var jwtKey = builder.Configuration["Jwt:Key"];
@@ -90,6 +97,7 @@ namespace PersonalDigitalVault
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
