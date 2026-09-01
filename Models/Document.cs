@@ -33,5 +33,7 @@ namespace PersonalDigitalVault.Models
         public int FolderId { get; set; }
 
         public Folder Folder { get; set; } = null!;
+
+        public string Sha256Hash { get; set; } = string.Empty;
     }
 }

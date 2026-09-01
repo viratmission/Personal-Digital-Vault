@@ -14,6 +14,8 @@ namespace PersonalDigitalVault.Data
         public DbSet<Folder> Folders { get; set; }
         public DbSet<Document> Documents { get; set; }
 
+        public DbSet<Credential> Credentials { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

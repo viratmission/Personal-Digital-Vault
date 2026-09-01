@@ -9,11 +9,13 @@ namespace PersonalDigitalVault.Interfaces
             UploadDocumentDto uploadDocumentDto,
             int userId);
 
-        Task<List<Document>> GetDocumentsByUserIdAsync(int userId);
-
-        Task<(Document? Document, string? FullPath)> GetDocumentForDownloadAsync(
-            int documentId,
+        Task<List<Document>> GetDocumentsByUserIdAsync(
             int userId);
+
+        Task<(Document? Document, byte[]? FileBytes)>
+            GetDocumentForDownloadAsync(
+                int documentId,
+                int userId);
 
         Task<Document?> RenameDocumentAsync(
             int documentId,
