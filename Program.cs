@@ -42,7 +42,15 @@ namespace PersonalDigitalVault
 
             builder.Services.AddScoped<ICredentialService, CredentialService>();
 
+            builder.Services.AddScoped<ISearchService, SearchService>();
 
+            builder.Services.AddScoped<IAdminService, AdminService>();
+
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AdminOnly", policy =>
+                    policy.RequireClaim("IsAdmin", "True"));
+            });
 
             var jwtKey = builder.Configuration["Jwt:Key"];
             var jwtIssuer = builder.Configuration["Jwt:Issuer"];
