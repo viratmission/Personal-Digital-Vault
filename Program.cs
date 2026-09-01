@@ -32,6 +32,18 @@ namespace PersonalDigitalVault
 
             builder.Services.AddScoped<IAuthService, AuthService>();
 
+            builder.Services.AddScoped<IAesEncryptionService, AesEncryptionService>();
+
+            builder.Services.AddScoped<IFileHashService, FileHashService>();
+
+            builder.Services.AddScoped<IFileEncryptionService, FileEncryptionService>();
+
+            builder.Services.AddScoped<ICredentialRepository, CredentialRepository>();
+
+            builder.Services.AddScoped<ICredentialService, CredentialService>();
+
+
+
             var jwtKey = builder.Configuration["Jwt:Key"];
             var jwtIssuer = builder.Configuration["Jwt:Issuer"];
             var jwtAudience = builder.Configuration["Jwt:Audience"];

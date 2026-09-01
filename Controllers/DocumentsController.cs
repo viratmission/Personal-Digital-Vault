@@ -71,40 +71,49 @@ namespace PersonalDigitalVault.Controllers
         [HttpGet("{id}/download")]
         public async Task<IActionResult> DownloadDocument(int id)
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            var userIdClaim =
+                User.FindFirst(ClaimTypes.NameIdentifier);
 
             if (userIdClaim == null)
             {
                 return Unauthorized();
             }
 
-            var userId = int.Parse(userIdClaim.Value);
+            var userId = int.Parse(
+                userIdClaim.Value);
 
-            var result = await _documentService
-                .GetDocumentForDownloadAsync(id, userId);
-
-            if (result.Document == null)
+            try
             {
-                return NotFound();
-            }
+                var result = await _documentService
+                    .GetDocumentForDownloadAsync(
+                        id,
+                        userId);
 
-            if (result.FullPath == null)
+                if (result.Document == null)
+                {
+                    return NotFound();
+                }
+
+                if (result.FileBytes == null)
+                {
+                    return NotFound(
+                        "Physical file not found.");
+                }
+
+                return File(
+                    result.FileBytes,
+                    result.Document.ContentType,
+                    result.Document.FileName);
+            }
+            catch (InvalidDataException ex)
             {
-                return NotFound("Physical file not found.");
+                return Conflict(ex.Message);
             }
-
-            var fileBytes = await System.IO.File.ReadAllBytesAsync(
-                result.FullPath);
-
-            return File(
-                fileBytes,
-                result.Document.ContentType,
-                result.Document.FileName);
         }
         [HttpPut("{id}")]
         public async Task<IActionResult> RenameDocument(
-    int id,
-    RenameDocumentDto renameDocumentDto)
+            int id,
+            RenameDocumentDto renameDocumentDto)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
 

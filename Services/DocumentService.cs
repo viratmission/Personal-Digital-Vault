@@ -10,17 +10,23 @@ namespace PersonalDigitalVault.Services
         private readonly IFolderRepository _folderRepository;
         private readonly IConfiguration _configuration;
         private readonly IWebHostEnvironment _environment;
+        private readonly IFileEncryptionService _fileEncryptionService;
+        private readonly IFileHashService _fileHashService;
 
         public DocumentService(
             IDocumentRepository documentRepository,
             IFolderRepository folderRepository,
             IConfiguration configuration,
-            IWebHostEnvironment environment)
+            IWebHostEnvironment environment,
+            IFileEncryptionService fileEncryptionService,
+            IFileHashService fileHashService)
         {
             _documentRepository = documentRepository;
             _folderRepository = folderRepository;
             _configuration = configuration;
             _environment = environment;
+            _fileEncryptionService = fileEncryptionService;
+            _fileHashService = fileHashService;
         }
 
         public async Task<Document?> UploadDocumentAsync(
@@ -68,11 +74,30 @@ namespace PersonalDigitalVault.Services
                 fullStoragePath,
                 storedFileName);
 
-            using (var stream = new FileStream(
+            using (var inputStream =
+                uploadDocumentDto.File.OpenReadStream())
+            using (var outputStream = new FileStream(
                 fullFilePath,
-                FileMode.CreateNew))
+                FileMode.CreateNew,
+                FileAccess.Write,
+                FileShare.None))
             {
-                await uploadDocumentDto.File.CopyToAsync(stream);
+                await _fileEncryptionService.EncryptAsync(
+                    inputStream,
+                    outputStream);
+            }
+
+            string sha256Hash;
+
+            using (var encryptedFileStream = new FileStream(
+                fullFilePath,
+                FileMode.Open,
+                FileAccess.Read,
+                FileShare.Read))
+            {
+                sha256Hash =
+                    await _fileHashService.GenerateSha256Async(
+                        encryptedFileStream);
             }
 
             var document = new Document
@@ -86,22 +111,28 @@ namespace PersonalDigitalVault.Services
                 FileSize = uploadDocumentDto.File.Length,
                 UploadedAt = DateTime.UtcNow,
                 UserId = userId,
-                FolderId = uploadDocumentDto.FolderId
+                FolderId = uploadDocumentDto.FolderId,
+                Sha256Hash = sha256Hash
             };
 
             return await _documentRepository.CreateAsync(document);
         }
-        public async Task<List<Document>> GetDocumentsByUserIdAsync(int userId)
+
+        public async Task<List<Document>>
+            GetDocumentsByUserIdAsync(int userId)
         {
-            return await _documentRepository.GetByUserIdAsync(userId);
+            return await _documentRepository
+                .GetByUserIdAsync(userId);
         }
-        public async Task<(Document? Document, string? FullPath)>
-          GetDocumentForDownloadAsync(
-               int documentId,
-               int userId)
+        public async Task<(Document? Document, byte[]? FileBytes)>
+            GetDocumentForDownloadAsync(
+                int documentId,
+                int userId)
         {
             var document = await _documentRepository
-                .GetByIdAndUserIdAsync(documentId, userId);
+                .GetByIdAndUserIdAsync(
+                    documentId,
+                    userId);
 
             if (document == null)
             {
@@ -117,31 +148,77 @@ namespace PersonalDigitalVault.Services
                 return (document, null);
             }
 
-            return (document, fullPath);
+            if (string.IsNullOrWhiteSpace(document.Sha256Hash))
+            {
+                throw new InvalidDataException(
+                    "File integrity hash is missing.");
+            }
+
+            using var encryptedStream = new FileStream(
+                fullPath,
+                FileMode.Open,
+                FileAccess.Read,
+                FileShare.Read);
+
+            var currentHash =
+                await _fileHashService.GenerateSha256Async(
+                    encryptedStream);
+
+            var hashMatches = string.Equals(
+                currentHash,
+                document.Sha256Hash,
+                StringComparison.OrdinalIgnoreCase);
+
+            if (!hashMatches)
+            {
+                throw new InvalidDataException(
+                    "File integrity check failed.");
+            }
+
+            encryptedStream.Position = 0;
+
+            using var decryptedStream =
+                new MemoryStream();
+
+            await _fileEncryptionService.DecryptAsync(
+                encryptedStream,
+                decryptedStream);
+
+            return (
+                document,
+                decryptedStream.ToArray());
         }
+
         public async Task<Document?> RenameDocumentAsync(
-    int documentId,
-    RenameDocumentDto renameDocumentDto,
-    int userId)
+            int documentId,
+            RenameDocumentDto renameDocumentDto,
+            int userId)
         {
             var document = await _documentRepository
-                .GetByIdAndUserIdAsync(documentId, userId);
+                .GetByIdAndUserIdAsync(
+                    documentId,
+                    userId);
 
             if (document == null)
             {
                 return null;
             }
 
-            document.FileName = renameDocumentDto.FileName.Trim();
+            document.FileName =
+                renameDocumentDto.FileName.Trim();
 
-            return await _documentRepository.UpdateAsync(document);
+            return await _documentRepository
+                .UpdateAsync(document);
         }
+
         public async Task<bool> DeleteDocumentAsync(
-    int documentId,
-    int userId)
+            int documentId,
+            int userId)
         {
             var document = await _documentRepository
-                .GetByIdAndUserIdAsync(documentId, userId);
+                .GetByIdAndUserIdAsync(
+                    documentId,
+                    userId);
 
             if (document == null)
             {
