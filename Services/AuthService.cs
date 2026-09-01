@@ -76,7 +76,8 @@ namespace PersonalDigitalVault.Services
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Email, user.Email)
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim("IsAdmin", user.IsAdmin.ToString())
             };
 
             var key = new SymmetricSecurityKey(
