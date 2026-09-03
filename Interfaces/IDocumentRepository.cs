@@ -11,9 +11,11 @@ namespace PersonalDigitalVault.Interfaces
         Task<Document?> GetByIdAndUserIdAsync(
             int documentId,
             int userId);
-
+        Task<List<Document>> GetByFolderIdAndUserIdAsync(int folderId,int userId);
         Task<Document> UpdateAsync(Document document);
 
         Task DeleteAsync(Document document);
+
+      
     }
 }

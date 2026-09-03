@@ -38,6 +38,15 @@ namespace PersonalDigitalVault.Repositories
                     d.Id == documentId &&
                     d.UserId == userId);
         }
+
+        public async Task<List<Document>> GetByFolderIdAndUserIdAsync( int folderId,int userId)
+        {
+            return await _context.Documents
+                .Where(d =>
+                    d.FolderId == folderId &&
+                    d.UserId == userId)
+                .ToListAsync();
+        }
         public async Task<Document> UpdateAsync(Document document)
         {
             _context.Documents.Update(document);

@@ -8,10 +8,15 @@ namespace PersonalDigitalVault.Services
     public class FolderService : IFolderService
     {
         private readonly IFolderRepository _folderRepository;
+        private readonly IDocumentRepository _documentRepository;
+        private readonly IWebHostEnvironment _environment;
 
-        public FolderService(IFolderRepository folderRepository)
+        public FolderService(IFolderRepository folderRepository, IDocumentRepository documentRepository,
+    IWebHostEnvironment environment)
         {
             _folderRepository = folderRepository;
+            _documentRepository = documentRepository;
+            _environment = environment;
         }
 
         public async Task<Folder> CreateFolderAsync(
@@ -50,7 +55,6 @@ namespace PersonalDigitalVault.Services
 
 
         }
-
         public async Task<bool> DeleteFolderAsync(
             int folderId,
             int userId)
@@ -63,9 +67,27 @@ namespace PersonalDigitalVault.Services
                 return false;
             }
 
-            await _folderRepository.DeleteAsync(folder);
-            return true;
+            var documents =
+                await _documentRepository
+                    .GetByFolderIdAndUserIdAsync(
+                        folderId,
+                        userId);
 
+            foreach (var document in documents)
+            {
+                var fullPath = Path.Combine(
+                    _environment.ContentRootPath,
+                    document.FilePath);
+
+                if (File.Exists(fullPath))
+                {
+                    File.Delete(fullPath);
+                }
+            }
+
+            await _folderRepository.DeleteAsync(folder);
+
+            return true;
         }
     }
 }
