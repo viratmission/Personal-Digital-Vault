@@ -27,6 +27,13 @@ export const routes: Routes = [
         .then(m => m.VaultShellComponent)
   },
   {
+  path: 'credentials',
+  canActivate: [authGuard],
+  loadComponent: () =>
+    import('./features/credentials/credential-shell/credential-shell.component')
+      .then(m => m.CredentialShellComponent)
+  },
+  {
     path: 'profile',
     canActivate: [authGuard],
     loadComponent: () =>
