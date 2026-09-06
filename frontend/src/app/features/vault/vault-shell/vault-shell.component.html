@@ -1,1 +1,280 @@
-<p>vault-shell works!</p>
+<div class="p-6">
+
+  <h1 class="text-2xl font-semibold mb-6">
+    My Vault
+  </h1>
+
+  <section class="mb-6">
+    <h2 class="text-lg font-medium mb-3">
+      Create Folder
+    </h2>
+
+    <div class="flex gap-2">
+      <input
+        type="text"
+        [(ngModel)]="newFolderName"
+        placeholder="Enter folder name"
+        class="border rounded px-3 py-2"
+      />
+
+      <button
+        type="button"
+        (click)="createFolder()"
+        [disabled]="isCreatingFolder"
+        class="border rounded px-4 py-2"
+      >
+        {{ isCreatingFolder ? 'Creating...' : 'Create Folder' }}
+      </button>
+    </div>
+  </section>
+
+  <p
+    *ngIf="successMessage"
+    class="text-green-600 mb-4"
+  >
+    {{ successMessage }}
+  </p>
+
+  <p
+    *ngIf="errorMessage"
+    class="text-red-600 mb-4"
+  >
+    {{ errorMessage }}
+  </p>
+
+  <section>
+    <h2 class="text-lg font-medium mb-3">
+      Folders
+    </h2>
+
+    <p *ngIf="isLoading">
+      Loading folders...
+    </p>
+
+    <div *ngIf="!isLoading">
+
+      <p *ngIf="folders.length === 0">
+        No folders found.
+      </p>
+
+      <ul *ngIf="folders.length > 0">
+
+        <li
+          *ngFor="let folder of folders"
+          class="border rounded p-3 mb-2"
+        >
+
+          <div *ngIf="editingFolderId !== folder.id">
+  <span>
+    {{ folder.name }}
+  </span>
+
+  <button
+    type="button"
+    (click)="startRename(folder)"
+    [disabled]="deletingFolderId === folder.id"
+    class="border rounded px-3 py-1 ml-3"
+  >
+    Rename
+  </button>
+
+  <button
+    type="button"
+    (click)="deleteFolder(folder)"
+    [disabled]="deletingFolderId === folder.id"
+    class="border rounded px-3 py-1 ml-2"
+  >
+    {{
+      deletingFolderId === folder.id
+        ? 'Deleting...'
+        : 'Delete'
+    }}
+    </button>
+    </div>
+          <div
+            *ngIf="editingFolderId === folder.id"
+            class="flex gap-2"
+          >
+            <input
+              type="text"
+              [(ngModel)]="editingFolderName"
+              class="border rounded px-3 py-1"
+            />
+
+            <button
+              type="button"
+              (click)="saveRename(folder.id)"
+              [disabled]="isRenamingFolder"
+              class="border rounded px-3 py-1"
+            >
+              {{ isRenamingFolder ? 'Saving...' : 'Save' }}
+            </button>
+
+            <button
+              type="button"
+              (click)="cancelRename()"
+              [disabled]="isRenamingFolder"
+              class="border rounded px-3 py-1"
+            >
+              Cancel
+            </button>
+          </div>
+
+        </li>
+
+      </ul>
+
+    </div>
+  </section>
+
+    <section class="mt-8 mb-6">
+  <h2 class="text-lg font-medium mb-3">
+    Upload Document
+  </h2>
+
+  <div class="flex flex-col gap-3 max-w-md">
+
+    <select
+      [(ngModel)]="selectedFolderId"
+      class="border rounded px-3 py-2"
+    >
+      <option [ngValue]="null">
+        Select folder
+      </option>
+
+      <option
+        *ngFor="let folder of folders"
+        [ngValue]="folder.id"
+      >
+        {{ folder.name }}
+      </option>
+    </select>
+
+    <input
+      type="file"
+      (change)="onFileSelected($event)"
+      class="border rounded px-3 py-2"
+    />
+
+    <button
+      type="button"
+      (click)="uploadDocument()"
+      [disabled]="isUploadingDocument"
+      class="border rounded px-4 py-2"
+    >
+      {{
+        isUploadingDocument
+          ? 'Uploading...'
+          : 'Upload Document'
+      }}
+    </button>
+
+  </div>
+
+  <p
+    *ngIf="documentSuccessMessage"
+    class="text-green-600 mt-3"
+  >
+    {{ documentSuccessMessage }}
+  </p>
+</section>
+    <section class="mt-8">
+        <h2 class="text-lg font-medium mb-3">
+            Documents
+        </h2>
+
+        <p *ngIf="isLoadingDocuments">
+            Loading documents...
+        </p>
+
+        <p
+            *ngIf="documentErrorMessage"
+            class="text-red-600 mb-4"
+        >
+            {{ documentErrorMessage }}
+        </p>
+
+        <div *ngIf="!isLoadingDocuments && !documentErrorMessage">
+
+            <p *ngIf="documents.length === 0">
+            No documents found.
+            </p>
+
+            <ul *ngIf="documents.length > 0">
+<li
+  *ngFor="let document of documents"
+  class="border rounded p-3 mb-2"
+>
+  <div *ngIf="editingDocumentId !== document.id">
+    <div>
+      <strong>{{ document.fileName }}</strong>
+    </div>
+
+    <div class="text-sm mb-2">
+      {{ document.fileSize }} bytes
+    </div>
+
+    <button
+      type="button"
+      (click)="downloadDocument(document)"
+      class="border rounded px-3 py-1"
+    >
+      Download
+    </button>
+
+    <button
+      type="button"
+      (click)="startDocumentRename(document)"
+      class="border rounded px-3 py-1 ml-2"
+    >
+      Rename
+    </button>
+    <button
+  type="button"
+  (click)="deleteDocument(document)"
+  [disabled]="deletingDocumentId === document.id"
+  class="border rounded px-3 py-1 ml-2"
+>
+  {{
+    deletingDocumentId === document.id
+      ? 'Deleting...'
+      : 'Delete'
+  }}
+</button>
+  </div>
+
+  <div *ngIf="editingDocumentId === document.id">
+    <input
+      type="text"
+      [(ngModel)]="editingDocumentFileName"
+      class="border rounded px-3 py-2"
+    />
+
+    <button
+      type="button"
+      (click)="saveDocumentRename(document.id)"
+      [disabled]="isRenamingDocument"
+      class="border rounded px-3 py-1 ml-2"
+    >
+      {{
+        isRenamingDocument
+          ? 'Saving...'
+          : 'Save'
+      }}
+    </button>
+
+    <button
+      type="button"
+      (click)="cancelDocumentRename()"
+      [disabled]="isRenamingDocument"
+      class="border rounded px-3 py-1 ml-2"
+    >
+      Cancel
+    </button>
+  </div>
+</li>
+            </ul>
+
+        </div>
+    </section>
+</div>
