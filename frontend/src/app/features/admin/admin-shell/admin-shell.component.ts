@@ -3,6 +3,7 @@ import { AdminService } from '../../../core/services/admin.service';
 import { AdminDashboard, AdminUser } from '../../../core/models/admin.model';
 
 @Component({
+  standalone: true,
   selector: 'app-admin-shell',
   imports: [],
   templateUrl: './admin-shell.component.html',

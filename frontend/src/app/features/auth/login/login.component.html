@@ -1,168 +1,26 @@
-<div class="min-h-screen bg-slate-100 px-4 py-10">
-  <div class="mx-auto flex min-h-[80vh] w-full max-w-md items-center">
-
-    <div class="w-full rounded-2xl bg-white p-8 shadow-lg">
-
-      <div class="mb-8 text-center">
-        <h1 class="text-3xl font-bold text-slate-900">
-          Welcome Back
-        </h1>
-
-        <p class="mt-2 text-sm text-slate-600">
-          Login to your Personal Digital Vault
-        </p>
+<div class="min-h-screen bg-slate-950">
+  <div class="grid min-h-screen lg:grid-cols-[1.05fr_.95fr]">
+    <section class="pdv-gradient relative hidden overflow-hidden p-10 text-white lg:flex lg:flex-col lg:justify-between xl:p-16">
+      <div class="absolute -right-24 -top-24 h-80 w-80 rounded-full bg-white/10 blur-3xl"></div>
+      <div><div class="flex items-center gap-3"><div class="grid h-11 w-11 place-items-center rounded-xl bg-white/15 font-black">V</div><span class="font-extrabold">Personal Digital Vault</span></div>
+      <div class="mt-auto max-w-xl pb-10"><p class="mb-4 text-xs font-bold uppercase tracking-[.2em] text-indigo-200">Private by design</p><h1 class="text-5xl font-black leading-tight">Your digital life.<br>One secure vault.</h1><p class="mt-6 max-w-lg text-base leading-7 text-indigo-100">Protect important documents, folders and credentials with a clean workspace built around privacy.</p><div class="mt-8 flex gap-6 text-sm text-indigo-100"><span>✓ Encrypted storage</span><span>✓ Secure access</span></div></div></div>
+      <p class="text-xs text-indigo-200/70">Personal Digital Vault · Secure workspace</p>
+    </section>
+    <section class="flex items-center justify-center bg-slate-50 p-5 sm:p-8">
+      <div class="w-full max-w-md">
+        <div class="mb-8 lg:hidden"><div class="flex items-center gap-3"><div class="grid h-10 w-10 place-items-center rounded-xl bg-indigo-600 font-black text-white">V</div><span class="font-extrabold">Personal Digital Vault</span></div></div>
+        <div class="pdv-card p-7 sm:p-9">
+          <p class="text-xs font-bold uppercase tracking-[.16em] text-indigo-600">Welcome back</p><h2 class="mt-2 text-3xl font-black tracking-tight">Sign in to your vault</h2><p class="mt-2 text-sm text-slate-500">Use your account credentials to continue.</p>
+          @if (errorMessage) { <div class="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{{ errorMessage }}</div> }
+          <form class="mt-7 space-y-5" (ngSubmit)="submit()">
+            <div><label class="mb-2 block text-xs font-bold text-slate-700">Email address</label><input class="pdv-input" type="email" name="email" [(ngModel)]="email" placeholder="you@example.com" autocomplete="email" required></div>
+            <div><div class="mb-2 flex items-center justify-between"><label class="text-xs font-bold text-slate-700">Password</label></div><div class="relative"><input class="pdv-input pr-16" [type]="showPassword ? 'text' : 'password'" name="password" [(ngModel)]="password" placeholder="Enter your password" autocomplete="current-password" required><button type="button" (click)="togglePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 hover:text-slate-700">{{ showPassword ? 'Hide' : 'Show' }}</button></div></div>
+            <button class="pdv-btn pdv-btn-primary w-full py-3.5" type="submit" [disabled]="isSubmitting">{{ isSubmitting ? 'Signing in…' : 'Sign in securely →' }}</button>
+          </form>
+          <p class="mt-7 text-center text-sm text-slate-500">New to the vault? <a routerLink="/register" class="font-bold text-indigo-600 hover:text-indigo-700">Create an account</a></p>
+        </div>
+        <p class="mt-5 text-center text-xs text-slate-400">Your session is protected with token-based authentication.</p>
       </div>
-
-      @if (errorMessage) {
-        <div
-          class="mb-5 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"
-        >
-          {{ errorMessage }}
-        </div>
-      }
-
-      <form
-        #loginForm="ngForm"
-        (ngSubmit)="submit()"
-        class="space-y-5"
-        novalidate
-      >
-
-        <div>
-          <label
-            for="email"
-            class="mb-1 block text-sm font-medium text-slate-700"
-          >
-            Email
-          </label>
-
-          <input
-            id="email"
-            type="email"
-            name="email"
-            [(ngModel)]="email"
-            #emailField="ngModel"
-            required
-            email
-            autocomplete="email"
-            placeholder="Enter your email"
-            class="w-full rounded-lg border border-slate-300 px-4 py-2.5 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-          />
-
-          @if (
-            emailField.touched &&
-            emailField.hasError('required')
-          ) {
-            <p class="mt-1 text-sm text-red-600">
-              Email is required.
-            </p>
-          }
-
-          @if (
-            emailField.touched &&
-            emailField.hasError('email')
-          ) {
-            <p class="mt-1 text-sm text-red-600">
-              Enter a valid email address.
-            </p>
-          }
-        </div>
-
-
-        <div>
-        <label
-            for="password"
-            class="mb-1 block text-sm font-medium text-slate-700"
-        >
-            Password
-        </label>
-
-        <div class="relative">
-            <input
-            id="password"
-            [type]="showPassword ? 'text' : 'password'"
-            name="password"
-            [(ngModel)]="password"
-            #passwordField="ngModel"
-            required
-            autocomplete="current-password"
-            placeholder="Enter your password"
-            class="w-full rounded-lg border border-slate-300 px-4 py-2.5 pr-12 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-            />
-
-            <button
-            type="button"
-            (click)="togglePasswordVisibility()"
-            class="absolute inset-y-0 right-0 flex items-center px-4 text-slate-500 hover:text-slate-700"
-            [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
-            >
-            @if (showPassword) {
-                <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                class="h-5 w-5"
-                >
-                <path d="M3 3l18 18"></path>
-                <path d="M10.6 10.6a2 2 0 002.8 2.8"></path>
-                <path d="M9.9 4.2A10.5 10.5 0 0112 4c5 0 9 4 10 8a12.7 12.7 0 01-2.1 4.2"></path>
-                <path d="M6.6 6.6A12.2 12.2 0 002 12c1 4 5 8 10 8a10.4 10.4 0 005.4-1.5"></path>
-                </svg>
-            } @else {
-                <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                class="h-5 w-5"
-                >
-                <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"></path>
-                <circle cx="12" cy="12" r="3"></circle>
-                </svg>
-            }
-            </button>
-        </div>
-
-        @if (
-            passwordField.touched &&
-            passwordField.hasError('required')
-        ) {
-            <p class="mt-1 text-sm text-red-600">
-            Password is required.
-            </p>
-        }
-        </div>
-
-
-        <button
-          type="submit"
-          [disabled]="loginForm.invalid || isSubmitting"
-          class="w-full rounded-lg bg-blue-600 px-4 py-2.5 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          @if (isSubmitting) {
-            Logging in...
-          } @else {
-            Login
-          }
-        </button>
-
-      </form>
-
-
-      <p class="mt-6 text-center text-sm text-slate-600">
-        Don't have an account?
-
-        <a
-          routerLink="/register"
-          class="font-semibold text-blue-600 hover:underline"
-        >
-          Create Account
-        </a>
-      </p>
-
-    </div>
+    </section>
   </div>
 </div>

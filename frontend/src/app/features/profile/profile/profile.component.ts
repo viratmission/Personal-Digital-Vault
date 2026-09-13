@@ -1,3 +1,5 @@
+import { CommonModule } from '@angular/common';
+
 import {
   Component,
   OnDestroy,
@@ -26,9 +28,7 @@ import { UpdateProfileRequest } from '../../../core/models/profile.model';
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [
-    ReactiveFormsModule
-  ],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
 })

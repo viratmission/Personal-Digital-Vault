@@ -5,6 +5,7 @@ import { SearchService } from '../../../core/services/search.service';
 import { SearchResult } from '../../../core/models/search.model';
 
 @Component({
+  standalone: true,
   selector: 'app-search',
   imports: [FormsModule],
   templateUrl: './search.component.html',

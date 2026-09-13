@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 
 import { Folder } from '../../../core/models/folder.model';
 import { FolderService } from '../../../core/services/folder.service';
@@ -10,7 +11,7 @@ import { DocumentService } from '../../../core/services/document.service';
 @Component({
   selector: 'app-vault-shell',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './vault-shell.component.html',
   styleUrl: './vault-shell.component.css'
 })

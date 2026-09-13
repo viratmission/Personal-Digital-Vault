@@ -1,287 +1,51 @@
-<div class="p-6">
+<div class="mx-auto max-w-7xl space-y-7">
+  <div class="flex flex-col justify-between gap-4 md:flex-row md:items-end"><div><p class="text-xs font-bold uppercase tracking-[.16em] text-indigo-600">Secure storage</p><h1 class="mt-2 text-3xl font-black tracking-tight">My Vault</h1><p class="mt-2 text-sm text-slate-500">Organize folders and keep important files protected.</p></div><a routerLink="/credentials" class="pdv-btn pdv-btn-secondary">◆ Secure Credentials</a></div>
+  @if (errorMessage) {<div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{{ errorMessage }}</div>}
+  @if (successMessage) {<div class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">{{ successMessage }}</div>}
+  @if (documentErrorMessage) {<div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{{ documentErrorMessage }}</div>}
+  @if (documentSuccessMessage) {<div class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">{{ documentSuccessMessage }}</div>}
 
-  <h1 class="text-2xl font-semibold mb-6">
-    My Vault
-  </h1>
-
-    <a
-    href="/credentials"
-    class="inline-block mb-6 border rounded px-4 py-2"
-  >
-    Secure Credentials
-  </a>
-
-  <section class="mb-6">
-    <h2 class="text-lg font-medium mb-3">
-      Create Folder
-    </h2>
-
-    <div class="flex gap-2">
-      <input
-        type="text"
-        [(ngModel)]="newFolderName"
-        placeholder="Enter folder name"
-        class="border rounded px-3 py-2"
-      />
-
-      <button
-        type="button"
-        (click)="createFolder()"
-        [disabled]="isCreatingFolder"
-        class="border rounded px-4 py-2"
-      >
-        {{ isCreatingFolder ? 'Creating...' : 'Create Folder' }}
-      </button>
-    </div>
-  </section>
-
-  <p
-    *ngIf="successMessage"
-    class="text-green-600 mb-4"
-  >
-    {{ successMessage }}
-  </p>
-
-  <p
-    *ngIf="errorMessage"
-    class="text-red-600 mb-4"
-  >
-    {{ errorMessage }}
-  </p>
-
-  <section>
-    <h2 class="text-lg font-medium mb-3">
-      Folders
-    </h2>
-
-    <p *ngIf="isLoading">
-      Loading folders...
-    </p>
-
-    <div *ngIf="!isLoading">
-
-      <p *ngIf="folders.length === 0">
-        No folders found.
-      </p>
-
-      <ul *ngIf="folders.length > 0">
-
-        <li
-          *ngFor="let folder of folders"
-          class="border rounded p-3 mb-2"
-        >
-
-          <div *ngIf="editingFolderId !== folder.id">
-  <span>
-    {{ folder.name }}
-  </span>
-
-  <button
-    type="button"
-    (click)="startRename(folder)"
-    [disabled]="deletingFolderId === folder.id"
-    class="border rounded px-3 py-1 ml-3"
-  >
-    Rename
-  </button>
-
-  <button
-    type="button"
-    (click)="deleteFolder(folder)"
-    [disabled]="deletingFolderId === folder.id"
-    class="border rounded px-3 py-1 ml-2"
-  >
-    {{
-      deletingFolderId === folder.id
-        ? 'Deleting...'
-        : 'Delete'
-    }}
-    </button>
-    </div>
-          <div
-            *ngIf="editingFolderId === folder.id"
-            class="flex gap-2"
-          >
-            <input
-              type="text"
-              [(ngModel)]="editingFolderName"
-              class="border rounded px-3 py-1"
-            />
-
-            <button
-              type="button"
-              (click)="saveRename(folder.id)"
-              [disabled]="isRenamingFolder"
-              class="border rounded px-3 py-1"
-            >
-              {{ isRenamingFolder ? 'Saving...' : 'Save' }}
-            </button>
-
-            <button
-              type="button"
-              (click)="cancelRename()"
-              [disabled]="isRenamingFolder"
-              class="border rounded px-3 py-1"
-            >
-              Cancel
-            </button>
-          </div>
-
-        </li>
-
-      </ul>
-
-    </div>
-  </section>
-
-    <section class="mt-8 mb-6">
-  <h2 class="text-lg font-medium mb-3">
-    Upload Document
-  </h2>
-
-  <div class="flex flex-col gap-3 max-w-md">
-
-    <select
-      [(ngModel)]="selectedFolderId"
-      class="border rounded px-3 py-2"
-    >
-      <option [ngValue]="null">
-        Select folder
-      </option>
-
-      <option
-        *ngFor="let folder of folders"
-        [ngValue]="folder.id"
-      >
-        {{ folder.name }}
-      </option>
-    </select>
-
-    <input
-      type="file"
-      (change)="onFileSelected($event)"
-      class="border rounded px-3 py-2"
-    />
-
-    <button
-      type="button"
-      (click)="uploadDocument()"
-      [disabled]="isUploadingDocument"
-      class="border rounded px-4 py-2"
-    >
-      {{
-        isUploadingDocument
-          ? 'Uploading...'
-          : 'Upload Document'
-      }}
-    </button>
-
+  <div class="grid gap-4 sm:grid-cols-3">
+    <div class="pdv-card p-5"><p class="text-xs font-bold uppercase tracking-wider text-slate-400">Folders</p><p class="mt-3 text-3xl font-black">{{ folders.length }}</p></div>
+    <div class="pdv-card p-5"><p class="text-xs font-bold uppercase tracking-wider text-slate-400">Documents</p><p class="mt-3 text-3xl font-black">{{ documents.length }}</p></div>
+    <div class="pdv-card p-5"><p class="text-xs font-bold uppercase tracking-wider text-slate-400">Protection</p><p class="mt-3 flex items-center gap-2 text-lg font-black text-emerald-600"><span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span>Active</p></div>
   </div>
 
-  <p
-    *ngIf="documentSuccessMessage"
-    class="text-green-600 mt-3"
-  >
-    {{ documentSuccessMessage }}
-  </p>
-</section>
-    <section class="mt-8">
-        <h2 class="text-lg font-medium mb-3">
-            Documents
-        </h2>
-
-        <p *ngIf="isLoadingDocuments">
-            Loading documents...
-        </p>
-
-        <p
-            *ngIf="documentErrorMessage"
-            class="text-red-600 mb-4"
-        >
-            {{ documentErrorMessage }}
-        </p>
-
-        <div *ngIf="!isLoadingDocuments && !documentErrorMessage">
-
-            <p *ngIf="documents.length === 0">
-            No documents found.
-            </p>
-
-            <ul *ngIf="documents.length > 0">
-<li
-  *ngFor="let document of documents"
-  class="border rounded p-3 mb-2"
->
-  <div *ngIf="editingDocumentId !== document.id">
-    <div>
-      <strong>{{ document.fileName }}</strong>
+  <div class="grid gap-6 xl:grid-cols-[.85fr_1.15fr]">
+    <div class="pdv-card p-6">
+      <div><h2 class="text-lg font-extrabold">Create a folder</h2><p class="mt-1 text-sm text-slate-400">Keep documents organized by purpose.</p></div>
+      <div class="mt-5 flex gap-2"><input class="pdv-input" [(ngModel)]="newFolderName" placeholder="e.g. Personal, Work, Finance" (keyup.enter)="createFolder()"><button class="pdv-btn pdv-btn-primary shrink-0" (click)="createFolder()" [disabled]="isCreatingFolder">{{ isCreatingFolder ? '…' : 'Create' }}</button></div>
+      <div class="mt-6 border-t border-slate-100 pt-5"><p class="mb-3 text-xs font-bold uppercase tracking-wider text-slate-400">Your folders</p>
+        @if (isLoading) {<p class="text-sm text-slate-400">Loading folders…</p>}
+        @else if (folders.length === 0) {<div class="rounded-xl bg-slate-50 p-5 text-center text-sm text-slate-400">No folders yet.</div>}
+        @else {<div class="space-y-2">@for (folder of folders; track folder.id) {
+          @if (editingFolderId === folder.id) {<div class="flex gap-2"><input class="pdv-input" [(ngModel)]="editingFolderName"><button class="pdv-btn pdv-btn-primary" (click)="saveRename(folder.id)" [disabled]="isRenamingFolder">Save</button><button class="pdv-btn pdv-btn-secondary" (click)="cancelRename()">Cancel</button></div>}
+          @else {<div class="flex items-center gap-3 rounded-xl border border-slate-200 p-3"><span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-50 text-indigo-600">▣</span><span class="min-w-0 flex-1 truncate text-sm font-bold">{{ folder.name }}</span><button class="text-xs font-bold text-slate-400 hover:text-indigo-600" (click)="startRename(folder)">Rename</button><button class="text-xs font-bold text-red-500 hover:text-red-700" (click)="deleteFolder(folder)" [disabled]="deletingFolderId===folder.id">Delete</button></div>}
+        }</div>}
+      </div>
     </div>
 
-    <div class="text-sm mb-2">
-      {{ document.fileSize }} bytes
+    <div class="pdv-card overflow-hidden">
+      <div class="border-b border-slate-100 px-6 py-5"><h2 class="text-lg font-extrabold">Upload a document</h2><p class="mt-1 text-sm text-slate-400">Files are sent to your protected vault.</p></div>
+      <div class="p-6">
+        <div class="rounded-2xl border-2 border-dashed border-indigo-200 bg-indigo-50/40 p-6 text-center"><div class="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-white text-xl shadow-sm">↑</div><p class="mt-3 text-sm font-bold text-slate-700">Choose a file from your device</p><p class="mt-1 text-xs text-slate-400">{{ selectedFile ? selectedFile.name : 'PDF, images, documents and more' }}</p><label class="pdv-btn pdv-btn-secondary mt-4 cursor-pointer">Browse files<input class="hidden" type="file" (change)="onFileSelected($event)"></label></div>
+        <div class="mt-4"><label class="mb-2 block text-xs font-bold text-slate-700">Destination folder</label><select class="pdv-input" [(ngModel)]="selectedFolderId"><option [ngValue]="null">Select a folder</option>@for (folder of folders; track folder.id) {<option [ngValue]="folder.id">{{ folder.name }}</option>}</select></div>
+        <button class="pdv-btn pdv-btn-primary mt-4 w-full" (click)="uploadDocument()" [disabled]="isUploadingDocument">{{ isUploadingDocument ? 'Uploading securely…' : 'Upload to vault →' }}</button>
+      </div>
     </div>
-
-    <button
-      type="button"
-      (click)="downloadDocument(document)"
-      class="border rounded px-3 py-1"
-    >
-      Download
-    </button>
-
-    <button
-      type="button"
-      (click)="startDocumentRename(document)"
-      class="border rounded px-3 py-1 ml-2"
-    >
-      Rename
-    </button>
-    <button
-  type="button"
-  (click)="deleteDocument(document)"
-  [disabled]="deletingDocumentId === document.id"
-  class="border rounded px-3 py-1 ml-2"
->
-  {{
-    deletingDocumentId === document.id
-      ? 'Deleting...'
-      : 'Delete'
-  }}
-</button>
   </div>
 
-  <div *ngIf="editingDocumentId === document.id">
-    <input
-      type="text"
-      [(ngModel)]="editingDocumentFileName"
-      class="border rounded px-3 py-2"
-    />
-
-    <button
-      type="button"
-      (click)="saveDocumentRename(document.id)"
-      [disabled]="isRenamingDocument"
-      class="border rounded px-3 py-1 ml-2"
-    >
-      {{
-        isRenamingDocument
-          ? 'Saving...'
-          : 'Save'
-      }}
-    </button>
-
-    <button
-      type="button"
-      (click)="cancelDocumentRename()"
-      [disabled]="isRenamingDocument"
-      class="border rounded px-3 py-1 ml-2"
-    >
-      Cancel
-    </button>
+  <div class="pdv-card overflow-hidden">
+    <div class="flex flex-col justify-between gap-3 border-b border-slate-100 px-5 py-5 sm:flex-row sm:items-center sm:px-6"><div><h2 class="font-extrabold">Documents</h2><p class="mt-1 text-xs text-slate-400">{{ documents.length }} protected file{{ documents.length === 1 ? '' : 's' }}</p></div><a routerLink="/search" class="text-xs font-bold text-indigo-600">Search vault →</a></div>
+    @if (isLoadingDocuments) {<div class="p-10 text-center text-sm text-slate-400">Loading documents…</div>}
+    @else if (documents.length === 0) {<div class="p-12 text-center"><div class="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-slate-100 text-slate-400">▤</div><p class="mt-4 font-bold">No documents yet</p><p class="mt-1 text-sm text-slate-400">Upload your first file above.</p></div>}
+    @else {<div class="hidden overflow-x-auto md:block"><table class="w-full text-left"><thead class="bg-slate-50 text-[10px] uppercase tracking-wider text-slate-400"><tr><th class="px-6 py-3 font-bold">File</th><th class="px-4 py-3 font-bold">Type</th><th class="px-4 py-3 font-bold">Uploaded</th><th class="px-4 py-3 text-right font-bold">Actions</th></tr></thead><tbody class="divide-y divide-slate-100">
+      @for (doc of documents; track doc.id) {<tr class="hover:bg-slate-50/70">
+        <td class="px-6 py-4">@if(editingDocumentId===doc.id){<div class="flex gap-2"><input class="pdv-input max-w-sm" [(ngModel)]="editingDocumentFileName"><button class="text-xs font-bold text-indigo-600" (click)="saveDocumentRename(doc.id)">Save</button><button class="text-xs font-bold text-slate-400" (click)="cancelDocumentRename()">Cancel</button></div>}@else{<div class="flex items-center gap-3"><span class="grid h-10 w-10 place-items-center rounded-lg bg-indigo-50 text-[9px] font-black text-indigo-600">{{ doc.fileName.split('.').pop()?.toUpperCase() }}</span><div><p class="max-w-xs truncate text-sm font-bold">{{ doc.fileName }}</p><p class="text-xs text-slate-400">{{ doc.fileSize | number }} bytes</p></div></div>}</td>
+        <td class="px-4 py-4 text-xs font-semibold text-slate-500">{{ doc.contentType }}</td><td class="px-4 py-4 text-xs text-slate-500">{{ doc.uploadedAt | date:'mediumDate' }}</td>
+        <td class="px-4 py-4"><div class="flex justify-end gap-3"><button class="text-xs font-bold text-indigo-600" (click)="downloadDocument(doc)">Download</button><button class="text-xs font-bold text-slate-500" (click)="startDocumentRename(doc)">Rename</button><button class="text-xs font-bold text-red-500" (click)="deleteDocument(doc)">Delete</button></div></td>
+      </tr>}
+    </tbody></table></div>
+    <div class="divide-y divide-slate-100 md:hidden">@for(doc of documents; track doc.id){<div class="p-5"><div class="flex gap-3"><span class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-indigo-50 text-[9px] font-black text-indigo-600">{{ doc.fileName.split('.').pop()?.toUpperCase() }}</span><div class="min-w-0 flex-1"><p class="truncate text-sm font-bold">{{ doc.fileName }}</p><p class="mt-1 text-xs text-slate-400">{{ doc.contentType }} · {{ doc.uploadedAt | date:'mediumDate' }}</p></div></div><div class="mt-4 flex gap-4"><button class="text-xs font-bold text-indigo-600" (click)="downloadDocument(doc)">Download</button><button class="text-xs font-bold text-slate-500" (click)="startDocumentRename(doc)">Rename</button><button class="text-xs font-bold text-red-500" (click)="deleteDocument(doc)">Delete</button></div></div>}</div>}
   </div>
-</li>
-            </ul>
-
-        </div>
-    </section>
 </div>

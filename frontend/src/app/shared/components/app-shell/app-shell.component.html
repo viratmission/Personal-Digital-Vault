@@ -1,0 +1,64 @@
+<div class="min-h-screen bg-slate-50">
+  <aside class="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col bg-slate-950 text-white lg:flex">
+    <div class="flex h-20 items-center gap-3 border-b border-white/10 px-6">
+      <div class="grid h-10 w-10 place-items-center rounded-xl bg-indigo-500 text-lg font-black shadow-lg shadow-indigo-500/20">V</div>
+      <div>
+        <p class="text-sm font-extrabold tracking-wide">Personal Digital</p>
+        <p class="text-xs text-slate-400">Vault</p>
+      </div>
+    </div>
+
+    <nav class="pdv-scroll flex-1 space-y-1 overflow-y-auto px-3 py-6">
+      <p class="px-3 pb-3 text-[10px] font-bold uppercase tracking-[.18em] text-slate-500">Workspace</p>
+      @for (item of navItems; track item.route) {
+        <a [routerLink]="item.route" routerLinkActive="bg-indigo-500 text-white shadow-lg shadow-indigo-950/20" [routerLinkActiveOptions]="{exact: item.route === '/dashboard'}"
+           class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-slate-400 transition hover:bg-white/5 hover:text-white">
+          <span class="grid h-8 w-8 place-items-center rounded-lg bg-white/5 text-base">{{ item.icon }}</span>
+          <span>{{ item.label }}</span>
+        </a>
+      }
+      <a routerLink="/admin" routerLinkActive="bg-indigo-500 text-white"
+         class="mt-5 flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-slate-400 transition hover:bg-white/5 hover:text-white">
+        <span class="grid h-8 w-8 place-items-center rounded-lg bg-white/5">⚙</span><span>Admin</span>
+      </a>
+    </nav>
+
+    <div class="m-3 rounded-2xl border border-emerald-400/15 bg-emerald-400/5 p-4">
+      <div class="flex items-center gap-2 text-xs font-bold text-emerald-300"><span class="h-2 w-2 rounded-full bg-emerald-400"></span>Vault protected</div>
+      <p class="mt-2 text-xs leading-5 text-slate-400">Your private files and credentials are secured by the vault.</p>
+    </div>
+  </aside>
+
+  <main class="lg:pl-64">
+    <header class="sticky top-0 z-30 border-b border-slate-200/80 bg-white/90 backdrop-blur">
+      <div class="flex h-20 items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center gap-3 lg:hidden">
+          <div class="grid h-10 w-10 place-items-center rounded-xl bg-indigo-600 font-black text-white">V</div>
+          <span class="text-sm font-extrabold">Personal Digital Vault</span>
+        </div>
+        <div class="hidden max-w-xl flex-1 items-center lg:flex">
+          <button routerLink="/search" class="flex w-full items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-left text-sm text-slate-400 transition hover:border-indigo-200 hover:bg-white">
+            <span class="text-lg">⌕</span><span>Search your vault...</span><span class="ml-auto rounded-md border border-slate-200 bg-white px-2 py-0.5 text-[10px] font-bold">Ctrl K</span>
+          </button>
+        </div>
+        <div class="flex items-center gap-3">
+          <button class="grid h-10 w-10 place-items-center rounded-xl border border-slate-200 bg-white text-slate-500 hover:bg-slate-50" title="Notifications">♢</button>
+          <div class="hidden h-8 w-px bg-slate-200 sm:block"></div>
+          <div class="hidden text-right sm:block"><p class="text-sm font-bold text-slate-800">{{ displayName }}</p><p class="text-xs text-slate-400">Secure account</p></div>
+          <button routerLink="/profile" class="grid h-10 w-10 place-items-center rounded-full bg-indigo-100 font-bold text-indigo-700">U</button>
+          <button (click)="logout()" class="hidden rounded-xl px-3 py-2 text-xs font-bold text-slate-500 hover:bg-slate-100 sm:block">Sign out</button>
+        </div>
+      </div>
+      <div class="flex gap-2 overflow-x-auto border-t border-slate-100 px-4 py-2 lg:hidden">
+        @for (item of navItems; track item.route) {
+          <a [routerLink]="item.route" routerLinkActive="bg-indigo-600 text-white" [routerLinkActiveOptions]="{exact: item.route === '/dashboard'}"
+             class="whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-bold text-slate-500">{{ item.label }}</a>
+        }
+      </div>
+    </header>
+
+    <section class="min-h-[calc(100vh-80px)] p-4 sm:p-6 lg:p-8">
+      <router-outlet></router-outlet>
+    </section>
+  </main>
+</div>
