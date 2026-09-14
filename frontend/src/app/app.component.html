@@ -1,0 +1,5 @@
+@if (isPublicPage || !authService.isLoggedIn()) {
+  <router-outlet></router-outlet>
+} @else {
+  <app-app-shell></app-app-shell>
+}

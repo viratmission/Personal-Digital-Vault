@@ -1,0 +1,17 @@
+import { Routes } from '@angular/router';
+import { authGuard } from './core/guards/auth.guard';
+import { adminGuard } from './core/guards/admin.guard';
+
+export const routes: Routes = [
+  { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
+  { path: 'login', loadComponent: () => import('./features/auth/login/login.component').then(m => m.LoginComponent) },
+  { path: 'register', loadComponent: () => import('./features/auth/register/register.component').then(m => m.RegisterComponent) },
+  { path: 'dashboard', canActivate: [authGuard], loadComponent: () => import('./features/dashboard/dashboard/dashboard.component').then(m => m.DashboardComponent) },
+  { path: 'vault', canActivate: [authGuard], loadComponent: () => import('./features/vault/vault-shell/vault-shell.component').then(m => m.VaultShellComponent) },
+  { path: 'credentials', canActivate: [authGuard], loadComponent: () => import('./features/credentials/credential-shell/credential-shell.component').then(m => m.CredentialShellComponent) },
+  { path: 'profile', canActivate: [authGuard], loadComponent: () => import('./features/profile/profile/profile.component').then(m => m.ProfileComponent) },
+  { path: 'search', canActivate: [authGuard], loadComponent: () => import('./features/search/search/search.component').then(m => m.SearchComponent) },
+  { path: 'admin', canActivate: [adminGuard], loadComponent: () => import('./features/admin/admin-shell/admin-shell.component').then(m => m.AdminShellComponent) },
+  { path: 'forbidden', loadComponent: () => import('./shared/components/forbidden/forbidden.component').then(m => m.ForbiddenComponent) },
+  { path: '**', loadComponent: () => import('./shared/components/not-found/not-found.component').then(m => m.NotFoundComponent) }
+];

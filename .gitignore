@@ -15,4 +15,5 @@ obj/
 TestResults/
 
 # Visual Studio Code
-.vscode/
+.vscode/ProtectedStorage/Documents/*
+ProtectedStorage/

@@ -23,7 +23,34 @@ namespace PersonalDigitalVault
                 )
             );
             builder.Services.AddScoped<IUserRepository, UserRepository>();
+            
+            builder.Services.AddScoped<IFolderRepository, FolderRepository>();
+            builder.Services.AddScoped<IFolderService, FolderService>();
+
+            builder.Services.AddScoped<IDocumentRepository, DocumentRepository>();
+            builder.Services.AddScoped<IDocumentService, DocumentService>();
+
             builder.Services.AddScoped<IAuthService, AuthService>();
+
+            builder.Services.AddScoped<IAesEncryptionService, AesEncryptionService>();
+
+            builder.Services.AddScoped<IFileHashService, FileHashService>();
+
+            builder.Services.AddScoped<IFileEncryptionService, FileEncryptionService>();
+
+            builder.Services.AddScoped<ICredentialRepository, CredentialRepository>();
+
+            builder.Services.AddScoped<ICredentialService, CredentialService>();
+
+            builder.Services.AddScoped<ISearchService, SearchService>();
+
+            builder.Services.AddScoped<IAdminService, AdminService>();
+
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AdminOnly", policy =>
+                    policy.RequireClaim("IsAdmin", "True"));
+            });
 
             var jwtKey = builder.Configuration["Jwt:Key"];
             var jwtIssuer = builder.Configuration["Jwt:Issuer"];
@@ -90,6 +117,7 @@ namespace PersonalDigitalVault
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
