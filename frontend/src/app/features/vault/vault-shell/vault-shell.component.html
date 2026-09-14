@@ -43,9 +43,66 @@
       @for (doc of documents; track doc.id) {<tr class="hover:bg-slate-50/70">
         <td class="px-6 py-4">@if(editingDocumentId===doc.id){<div class="flex gap-2"><input class="pdv-input max-w-sm" [(ngModel)]="editingDocumentFileName"><button class="text-xs font-bold text-indigo-600" (click)="saveDocumentRename(doc.id)">Save</button><button class="text-xs font-bold text-slate-400" (click)="cancelDocumentRename()">Cancel</button></div>}@else{<div class="flex items-center gap-3"><span class="grid h-10 w-10 place-items-center rounded-lg bg-indigo-50 text-[9px] font-black text-indigo-600">{{ doc.fileName.split('.').pop()?.toUpperCase() }}</span><div><p class="max-w-xs truncate text-sm font-bold">{{ doc.fileName }}</p><p class="text-xs text-slate-400">{{ doc.fileSize | number }} bytes</p></div></div>}</td>
         <td class="px-4 py-4 text-xs font-semibold text-slate-500">{{ doc.contentType }}</td><td class="px-4 py-4 text-xs text-slate-500">{{ doc.uploadedAt | date:'mediumDate' }}</td>
-        <td class="px-4 py-4"><div class="flex justify-end gap-3"><button class="text-xs font-bold text-indigo-600" (click)="downloadDocument(doc)">Download</button><button class="text-xs font-bold text-slate-500" (click)="startDocumentRename(doc)">Rename</button><button class="text-xs font-bold text-red-500" (click)="deleteDocument(doc)">Delete</button></div></td>
+        <td class="px-4 py-4"><div class="flex justify-end gap-3"><button class="text-xs font-bold text-indigo-600" (click)="downloadDocument(doc)">Download</button><button class="text-xs font-bold text-slate-500" (click)="startDocumentRename(doc)">Rename</button><button class="text-xs font-bold text-red-500" (click)="deleteDocument(doc)" [disabled]="deletingDocumentId===doc.id">Delete</button></div></td>
       </tr>}
     </tbody></table></div>
-    <div class="divide-y divide-slate-100 md:hidden">@for(doc of documents; track doc.id){<div class="p-5"><div class="flex gap-3"><span class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-indigo-50 text-[9px] font-black text-indigo-600">{{ doc.fileName.split('.').pop()?.toUpperCase() }}</span><div class="min-w-0 flex-1"><p class="truncate text-sm font-bold">{{ doc.fileName }}</p><p class="mt-1 text-xs text-slate-400">{{ doc.contentType }} · {{ doc.uploadedAt | date:'mediumDate' }}</p></div></div><div class="mt-4 flex gap-4"><button class="text-xs font-bold text-indigo-600" (click)="downloadDocument(doc)">Download</button><button class="text-xs font-bold text-slate-500" (click)="startDocumentRename(doc)">Rename</button><button class="text-xs font-bold text-red-500" (click)="deleteDocument(doc)">Delete</button></div></div>}</div>}
+    <div class="divide-y divide-slate-100 md:hidden">@for(doc of documents; track doc.id){<div class="p-5"><div class="flex gap-3"><span class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-indigo-50 text-[9px] font-black text-indigo-600">{{ doc.fileName.split('.').pop()?.toUpperCase() }}</span><div class="min-w-0 flex-1"><p class="truncate text-sm font-bold">{{ doc.fileName }}</p><p class="mt-1 text-xs text-slate-400">{{ doc.contentType }} · {{ doc.uploadedAt | date:'mediumDate' }}</p></div></div><div class="mt-4 flex gap-4"><button class="text-xs font-bold text-indigo-600" (click)="downloadDocument(doc)">Download</button><button class="text-xs font-bold text-slate-500" (click)="startDocumentRename(doc)">Rename</button><button class="text-xs font-bold text-red-500" (click)="deleteDocument(doc)" [disabled]="deletingDocumentId===doc.id">Delete</button></div></div>}</div>}
   </div>
 </div>
+
+@if (showDeleteModal) {
+  <div
+    class="fixed inset-0 z-[100] grid place-items-center bg-slate-950/45 p-4 backdrop-blur-sm"
+    role="dialog"
+    aria-modal="true"
+    (click)="closeDeleteModal()">
+
+    <div
+      class="w-full max-w-md overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
+      (click)="$event.stopPropagation()">
+
+      <div class="p-6 sm:p-7">
+        <div class="flex items-start gap-4">
+          <div class="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-red-50 text-red-600">
+            🗑
+          </div>
+
+          <div class="min-w-0">
+            <h2 class="text-lg font-black text-slate-950">
+              Delete {{ deleteTargetType === 'folder' ? 'folder' : 'document' }}?
+            </h2>
+            <p class="mt-1 text-sm leading-6 text-slate-500">
+              Are you sure you want to delete
+              <span class="font-bold text-slate-700">“{{ deleteTargetName }}”</span>?
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-5 rounded-xl border border-red-100 bg-red-50 px-4 py-3">
+          <p class="text-xs font-semibold leading-5 text-red-700">
+            This action cannot be undone. The selected item will be permanently removed from your vault.
+          </p>
+        </div>
+      </div>
+
+      <div class="flex flex-col-reverse gap-3 border-t border-slate-100 bg-slate-50/70 p-4 sm:flex-row sm:justify-end">
+        <button
+          type="button"
+          class="pdv-btn pdv-btn-secondary w-full sm:w-auto"
+          (click)="closeDeleteModal()"
+          [disabled]="deletingFolderId !== null || deletingDocumentId !== null">
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          class="pdv-btn w-full bg-red-600 text-white hover:bg-red-700 sm:w-auto"
+          (click)="confirmDelete()"
+          [disabled]="deletingFolderId !== null || deletingDocumentId !== null">
+          {{ (deletingFolderId !== null || deletingDocumentId !== null) ? 'Deleting…' : 'Delete' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

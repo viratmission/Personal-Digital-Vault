@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 
 import { SearchService } from '../../../core/services/search.service';
 import { SearchResult } from '../../../core/models/search.model';
@@ -11,7 +12,8 @@ import { SearchResult } from '../../../core/models/search.model';
   templateUrl: './search.component.html',
   styleUrl: './search.component.css'
 })
-export class SearchComponent {
+export class SearchComponent implements OnInit {
+  private readonly route = inject(ActivatedRoute);
 
   searchTerm = '';
   itemType = '';
@@ -22,6 +24,14 @@ export class SearchComponent {
   errorMessage = '';
 
   constructor(private searchService: SearchService) {}
+
+  ngOnInit(): void {
+    const term = this.route.snapshot.queryParamMap.get('term');
+    if (term) {
+      this.searchTerm = term;
+      this.onSearch();
+    }
+  }
 
   onSearch(): void {
     const term = this.searchTerm.trim();

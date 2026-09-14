@@ -48,6 +48,11 @@ export class VaultShellComponent implements OnInit {
 
   deletingDocumentId: number | null = null;
 
+  showDeleteModal = false;
+  deleteTargetType: 'document' | 'folder' | null = null;
+  deleteTargetId: number | null = null;
+  deleteTargetName = '';
+
   constructor(
     private folderService: FolderService,
     private documentService: DocumentService
@@ -153,33 +158,7 @@ export class VaultShellComponent implements OnInit {
   }
 
   deleteFolder(folder: Folder): void {
-    const confirmed = window.confirm(
-      `Are you sure you want to delete "${folder.name}"?`
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
-    this.deletingFolderId = folder.id;
-    this.errorMessage = '';
-    this.successMessage = '';
-
-    this.folderService.deleteFolder(folder.id).subscribe({
-      next: () => {
-        this.folders = this.folders.filter(
-          item => item.id !== folder.id
-        );
-
-        this.successMessage = 'Folder deleted successfully.';
-        this.deletingFolderId = null;
-      },
-      error: (error) => {
-        console.error('Failed to delete folder:', error);
-        this.errorMessage = 'Unable to delete folder.';
-        this.deletingFolderId = null;
-      }
-    });
+    this.openDeleteModal('folder', folder.id, folder.name);
   }
 
   loadDocuments(): void {
@@ -335,37 +314,86 @@ saveDocumentRename(documentId: number): void {
 }
 
 deleteDocument(vaultDocument: VaultDocument): void {
-  const confirmed = window.confirm(
-    `Are you sure you want to delete "${vaultDocument.fileName}"?`
-  );
+  this.openDeleteModal('document', vaultDocument.id, vaultDocument.fileName);
+}
 
-  if (!confirmed) {
+openDeleteModal(
+  type: 'document' | 'folder',
+  id: number,
+  name: string
+): void {
+  this.deleteTargetType = type;
+  this.deleteTargetId = id;
+  this.deleteTargetName = name;
+  this.showDeleteModal = true;
+}
+
+closeDeleteModal(): void {
+  if (this.deletingFolderId !== null || this.deletingDocumentId !== null) {
     return;
   }
 
-  this.deletingDocumentId = vaultDocument.id;
+  this.showDeleteModal = false;
+  this.deleteTargetType = null;
+  this.deleteTargetId = null;
+  this.deleteTargetName = '';
+}
+
+confirmDelete(): void {
+  if (this.deleteTargetType === null || this.deleteTargetId === null) {
+    return;
+  }
+
+  const type = this.deleteTargetType;
+  const id = this.deleteTargetId;
+
+  if (type === 'folder') {
+    this.deletingFolderId = id;
+    this.errorMessage = '';
+    this.successMessage = '';
+
+    this.folderService.deleteFolder(id).subscribe({
+      next: () => {
+        this.folders = this.folders.filter(item => item.id !== id);
+        this.successMessage = 'Folder deleted successfully.';
+        this.deletingFolderId = null;
+        this.finishDeleteModal();
+      },
+      error: (error) => {
+        console.error('Failed to delete folder:', error);
+        this.errorMessage = 'Unable to delete folder.';
+        this.deletingFolderId = null;
+        this.finishDeleteModal();
+      }
+    });
+
+    return;
+  }
+
+  this.deletingDocumentId = id;
   this.documentErrorMessage = '';
   this.documentSuccessMessage = '';
 
-  this.documentService.deleteDocument(vaultDocument.id).subscribe({
+  this.documentService.deleteDocument(id).subscribe({
     next: () => {
-      this.documents = this.documents.filter(
-        item => item.id !== vaultDocument.id
-      );
-
-      this.documentSuccessMessage =
-        'Document deleted successfully.';
-
+      this.documents = this.documents.filter(item => item.id !== id);
+      this.documentSuccessMessage = 'Document deleted successfully.';
       this.deletingDocumentId = null;
+      this.finishDeleteModal();
     },
     error: (error) => {
       console.error('Failed to delete document:', error);
-
-      this.documentErrorMessage =
-        'Unable to delete document.';
-
+      this.documentErrorMessage = 'Unable to delete document.';
       this.deletingDocumentId = null;
+      this.finishDeleteModal();
     }
   });
+}
+
+private finishDeleteModal(): void {
+  this.showDeleteModal = false;
+  this.deleteTargetType = null;
+  this.deleteTargetId = null;
+  this.deleteTargetName = '';
 }
 }
